@@ -14,10 +14,36 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-    private  final MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+
     public Long save(MemberDTO memberDTO) {
         MemberEntity memberEntity = MemberEntity.toSaveEntity(memberDTO);
         return memberRepository.save(memberEntity).getId();
+    }
+
+    public boolean login(MemberDTO memberDTO) {
+     /*
+            DB에서 로그인하는 사용자의 이메일로 조회한 결과를 가져와서
+            비밀번호가 일치하는지 비교한 뒤 로그인 성공 여부를 판단
+
+            findByMemberEmail()
+            select * from member_table where member_email = ?
+
+            findById()
+            => select * from member_table where id = ?
+         */
+        // 1.
+//        MemberEntity memberEntity = memberRepository.findByMemberEmail(memberDTO.getMemberEmail())
+//                                                    .orElseThrow(() -> new NoSuchElementException());
+        // 2. email, password 둘다 만족하는 조회결과가 있다면 로그인성공, 없다면 로그인실패
+        Optional<MemberEntity> optionalMemberEntity =
+                memberRepository.findByMemberEmailAndMemberPassword(memberDTO.getMemberEmail(), memberDTO.getMemberPassword());
+        if (optionalMemberEntity.isPresent()) {
+//            MemberEntity memberEntity = optionalMemberEntity.get();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public List<MemberDTO> findAll() {
@@ -27,27 +53,27 @@ public class MemberService {
 //            MemberDTO memberDTO = MemberDTO.toDTO(memberEntity);
 //            memberDTOList.add(memberDTO);
         //memberDTOList.add(MemberDTO.toDTO(memberEntity));
-        memberEntityList.forEach(entity ->{
+        memberEntityList.forEach(entity -> {
             memberDTOList.add(MemberDTO.toDTO(entity));
         });
         return memberDTOList;
-        }
+    }
 
     public MemberDTO findById(Long id) {
-       Optional<MemberEntity> optionalMemberEntity =memberRepository.findById(id);
-       if(optionalMemberEntity.isPresent()){
-           MemberEntity memberEntity =optionalMemberEntity.get();
-           return MemberDTO.toDTO(memberEntity);
-       } else{
-           return null;
-       }
-      //MemberEntity memberEntity=memberRepository.findById(id).orElseThrow(() -> new NoSuchElementException());
-       // return MemberDTO.toDTO(memberEntity);
+        Optional<MemberEntity> optionalMemberEntity = memberRepository.findById(id);
+        if (optionalMemberEntity.isPresent()) {
+            MemberEntity memberEntity = optionalMemberEntity.get();
+            return MemberDTO.toDTO(memberEntity);
+        } else {
+            return null;
+        }
+        //MemberEntity memberEntity=memberRepository.findById(id).orElseThrow(() -> new NoSuchElementException());
+        // return MemberDTO.toDTO(memberEntity);
 
     }
 
     public void update(MemberDTO memberDTO) {
-        MemberEntity memberEntity= MemberEntity.toUpdateEntity(memberDTO);
+        MemberEntity memberEntity = MemberEntity.toUpdateEntity(memberDTO);
         memberRepository.save(memberEntity);
 
     }
@@ -55,35 +81,16 @@ public class MemberService {
     public void deleteById(Long id) {
         memberRepository.deleteById(id);
     }
-    public MemberDTO login(MemberDTO memberDTO) {
-
-        Optional<MemberEntity> byMemberEmail = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
-
-        if (byMemberEmail.isPresent()) {
-            // 조회 결과가 있다(해당 이메일을 가진 회원 정보가 있다)
-            MemberEntity memberEntity = byMemberEmail.get();
-            if (memberEntity.getMemberPassword().equals(memberDTO.getMemberPassword())) {
-                // 비밀번호 일치
-                // entity -> dto 변환 후 리턴
-                MemberDTO dto = MemberDTO.toDTO(memberEntity);
-                return dto;
-            } else {
-                // 비밀번호 불일치(로그인실패)
-                return null;
-            }
-        } else {
-            // 조회 결과가 없다(해당 이메일을 가진 회원이 없다)
-            return null;
-        }
-    }
 
 
-    public String emailCheck(String memberEmail) {
-        Optional<MemberEntity> byMemberEmail = memberRepository.findByMemberEmail(memberEmail);
-        if (byMemberEmail.isPresent()) {
-            return null;
-        } else {
-            return "ok";
-        }
-    }
+
+
+//    public String emailCheck(String memberEmail) {
+//        Optional<MemberEntity> byMemberEmail = memberRepository.findByMemberEmail(memberEmail);
+//        if (byMemberEmail.isPresent()) {
+//            return null;
+//        } else {
+//            return "ok";
+//        }
+//    }
 }

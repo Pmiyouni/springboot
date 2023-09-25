@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Controller
+//@RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService  memberService;
@@ -29,7 +30,23 @@ public class MemberController {
         return "memberPages/memberLogin";
     }
 
-    @GetMapping("/members")
+    @GetMapping("/member/login")
+    public String loginForm() {
+        return "memberPages/memberLogin";
+    }
+
+    @PostMapping("/member/login")
+    public String login(@ModelAttribute MemberDTO memberDTO, HttpSession session) {
+        boolean loginResult = memberService.login(memberDTO);
+        if (loginResult) {
+            session.setAttribute("loginEmail", memberDTO.getMemberEmail());
+            return "memberPages/memberMain";
+        } else {
+            return "memberPages/memberLogin";
+        }
+    }
+
+    @GetMapping("/member/members")
     public String list(Model model){
         List<MemberDTO> memberDTOList=memberService.findAll();
         model.addAttribute("memberlist",memberDTOList);
@@ -69,23 +86,8 @@ public class MemberController {
         return "redirect:/members";
     }
 
-    @GetMapping("/member/login")
-    public String loginForm() {
-        return "memberPages/memberLogin";
-    }
 
-    @PostMapping("/member/login")
-    public String login(@ModelAttribute MemberDTO memberDTO,Model model, HttpSession session) {
-        MemberDTO loginResult = memberService.login(memberDTO);
-        if (loginResult != null) {
-            // login 성공
-            session.setAttribute("loginEmail", loginResult.getMemberEmail());
-            return "main";
-        } else {
-            // login 실패
-            return "login";
-        }
-    }
+
 
         @GetMapping("/member/logout")
         public String logout(HttpSession session) {
@@ -94,11 +96,10 @@ public class MemberController {
             return "redirect:/";
         }
 
-        @PostMapping("/member/dup-check")
-        public ResponseEntity duplicateCheck(@RequestParam("memberEmail") String memberEmail) {
-            System.out.println("memberEmail = " + memberEmail);
-            String checkResult = memberService.emailCheck(memberEmail);
-            return checkResult;
+//        @PostMapping("/member/dup-check")
+//        public ResponseEntity duplicateCheck(@RequestParam("memberEmail") String memberEmail) {
+//            String checkResult = memberService.emailCheck(memberEmail);
+//            return checkResult;
 //        if (checkResult != null) {
 //            return "ok";
 //        } else {
@@ -106,5 +107,5 @@ public class MemberController {
 //        }
         }
 
-    }
+
 
