@@ -3,8 +3,6 @@ package com.icia.member.controller;
 import com.icia.member.dto.MemberDTO;
 import com.icia.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +24,7 @@ public class MemberController {
 
     @PostMapping("/member/save")
     public String save(@ModelAttribute MemberDTO memberDTO){
+        System.out.println("memberDTO = " + memberDTO);
           memberService.save(memberDTO);
         return "memberPages/memberLogin";
     }
@@ -46,7 +45,7 @@ public class MemberController {
         }
     }
 
-    @GetMapping("/member/members")
+    @GetMapping("/members")
     public String list(Model model){
         List<MemberDTO> memberDTOList=memberService.findAll();
         model.addAttribute("memberlist",memberDTOList);

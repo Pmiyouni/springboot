@@ -16,16 +16,16 @@ public class MemberEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 50, nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String memberEmail;
 
-    @Column(length = 20, nullable = false)
+    @Column(nullable = false)
     private String memberPassword;
-    @Column(length = 20, nullable = false)
+    @Column(nullable = false)
     private String memberName;
-    @Column(length = 20)
+    @Column
     private String memberBirth;
-    @Column(length = 30)
+    @Column
     private String memberMobile;
 
 
